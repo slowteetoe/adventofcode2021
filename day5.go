@@ -9,10 +9,6 @@ import (
 	"strings"
 )
 
-func Day5Part2() {
-	// Not yet implemented
-}
-
 func Day5Part1() {
 	lines, maxDimension := readLines("05-input.txt")
 	gridSize := maxDimension + 1 // since grid is zero-based, we need a 8x8 grid to hold (0,7)
@@ -20,14 +16,31 @@ func Day5Part1() {
 	grid := newGrid(gridSize)
 	for _, line := range lines {
 		if line.Diagonal() {
-			// log.Printf("Ignoring diagonal line %s", line.String())
+			// ignore diagonals
 			continue
 		}
 		for _, p := range line.Points() {
 			grid.mark(p)
 		}
 	}
-	if gridSize < 120 { // otherwise too wide to display
+	if gridSize < 120 {
+		log.Printf("\n%s\n", grid.String())
+	}
+	log.Printf("answer: %d", grid.OverlapCount())
+}
+
+func Day5Part2() {
+	lines, maxDimension := readLines("05-input.txt")
+	gridSize := maxDimension + 1 // since grid is zero-based, we need a 8x8 grid to hold (0,7)
+	log.Printf("Need a %dx%d grid to hold the input", gridSize, gridSize)
+	grid := newGrid(gridSize)
+	for _, line := range lines {
+		// log.Printf("%s consists of points: %v", line.String(), line.Points())
+		for _, p := range line.Points() {
+			grid.mark(p)
+		}
+	}
+	if gridSize < 120 {
 		log.Printf("\n%s\n", grid.String())
 	}
 	log.Printf("answer: %d", grid.OverlapCount())
@@ -115,7 +128,28 @@ func (l Line) Diagonal() bool {
 func (l Line) Points() []Point {
 	points := []Point{}
 	if l.Diagonal() {
-		log.Printf("I don't know how to deal with diagonals right now")
+		var dx, dy int
+		if l.start.x < l.end.x {
+			if l.start.y < l.end.y {
+				dx = 1
+				dy = 1
+			} else {
+				dx = 1
+				dy = -1
+			}
+		} else {
+			if l.start.y < l.end.y {
+				dx = -1
+				dy = 1
+			} else {
+				dx = -1
+				dy = -1
+			}
+		}
+		for n := 0; n <= abs(l.start.x-l.end.x); n++ {
+			points = append(points, Point{l.start.x + n*dx, l.start.y + n*dy})
+		}
+
 	} else if l.start.x == l.end.x {
 		// horizontal line
 		for dy := min(l.start.y, l.end.y); dy <= max(l.start.y, l.end.y); dy++ {
@@ -170,4 +204,11 @@ func min(x, y int) int {
 		return x
 	}
 	return y
+}
+
+func abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
 }
