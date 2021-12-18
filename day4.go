@@ -55,62 +55,40 @@ func Day4Part1() {
 }
 
 func Day4Part2() {
-	called, boards := readInput("04-example.txt")
+	called, boards := readInput("04-input.txt")
 	remaining := len(boards)
 	log.Printf("calledNumbers: %v, num boards: %d", called, remaining)
 	for _, number := range called {
 		log.Printf("Calling %d", number)
 	RecheckBoards:
-		for _, board := range boards {
-			if board.bingo {
-				log.Println("skipping bingo'd board")
+		for i := range boards {
+			if boards[i].bingo {
 				continue
 			}
 			// otherwise check and mark the spot
-			for i, spot := range board.spots {
-				if spot == number {
-					board.spots[i] = -1
+			for s := range boards[i].spots {
+				if boards[i].spots[s] == number {
+					boards[i].spots[s] = -1
 					break
 				}
 			}
 
 			// see if there's a winning line
 			for _, line := range checks {
-				// log.Printf("checking board id=%d", boardId)
-				win := checkForWin(board.spots, line)
+				win := checkForWin(boards[i].spots, line)
 				if win {
-					board.bingo = true
-					sum := sumBoard(board.spots)
+					boards[i].bingo = true
+					sum := sumBoard(boards[i].spots)
 
 					if remaining == 1 {
-						log.Printf("*** ULTIMATE WINNER (via %v) *** sum=%d, last number called=%d, answer=%d", line, sum, number, sum*number)
-						log.Println(board.String())
+						log.Printf("*** ULTIMATE WINNER *** sum=%d, last number called=%d, answer=%d", sum, number, sum*number)
+						log.Println(boards[i].String())
 						return
 					} else {
-						log.Printf("*** BINGO (via %v) *** sum=%d, last number called=%d, answer=%d", line, sum, number, sum*number)
-
-						// take this board out of the running
-						log.Printf("Taking board out of the running (curr: %d) ...", remaining)
-
-						// tmp := []Board{}
-						// // THIS PART IS BROKEN!
-						// for _, b := range boards {
-						// 	if !b.bingo {
-						// 		tmp = append(tmp, b)
-						// 	} else {
-						// 		log.Printf("NOT ADDING WINNING BOARD\n%v\n", b)
-						// 	}
-						// }
-						// boards = tmp
+						log.Printf("*** BINGO ***")
+						// log.Printf("sum=%d, last number called=%d, answer=%d", sum, number, sum*number)
 						remaining -= 1
-						log.Printf("%d non-winning boards remaining.", remaining)
-						if remaining <= 5 {
-							for _, b := range boards {
-								if !b.bingo {
-									log.Println(b.String())
-								}
-							}
-						}
+						log.Printf("Taking board out of the running...%d non-winning boards remaining.", remaining)
 						continue RecheckBoards
 					}
 				}
