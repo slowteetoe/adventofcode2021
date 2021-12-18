@@ -142,10 +142,8 @@ func sumBoard(board []int) int {
 }
 
 func checkForWin(board []int, line []int) bool {
-	// log.Printf("checking line %v", line)
 	for _, pos := range line {
 		if board[pos] != -1 {
-			// log.Println("not a winner")
 			return false
 		}
 	}
