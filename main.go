@@ -12,5 +12,7 @@ func main() {
 	// Day5Part1()
 	// Day5Part2()
 	// Day6Part1()
-	Day6Part2()
+	// Day6Part2()
+	// Day7Part1()
+	Day7Part2()
 }
