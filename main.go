@@ -1,5 +1,7 @@
 package main
 
+var debug = false
+
 func main() {
 	// Day1Part1()
 	// Day1Part2()
@@ -17,6 +19,6 @@ func main() {
 	// Day7Part2()
 	// Day8Part1()
 	// Day8Part2()
-	Day9Part1()
-	// Day9Part2()
+	// Day9Part1()
+	Day9Part2()
 }
