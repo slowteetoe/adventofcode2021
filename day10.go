@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"log"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -46,6 +47,79 @@ func Day10Part1() {
 	}
 }
 
+func Day10Part2() {
+	file, err := os.Open("10-input.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+
+	scores := []int{}
+	for scanner.Scan() {
+		score, corrupted := correctLine(scanner.Text())
+		if !corrupted {
+			scores = append(scores, score)
+		}
+	}
+	sort.Ints(scores)
+	log.Printf("Final score: %d  (%v)", scores[len(scores)/2], scores)
+}
+
+func correctLine(line string) (int, bool) {
+	completions := map[string]string{"(": ")", "[": "]", "{": "}", "<": ">"}
+	m := map[string]string{")": "(", "]": "[", "}": "{", ">": "<"}
+	log.Printf("attempting to correct: %s", line)
+	stack := Stack{}
+	for _, c := range strings.Split(line, "") {
+		switch c {
+		case "(", "[", "{", "<":
+			// log.Printf("Pushing %s", c)
+			stack.Push(c)
+		default:
+			// log.Printf("Dealing with %s", c)
+			actual, _ := stack.Pop()
+			if m[c] != actual {
+				log.Printf("Corrupted line, discarding %s", line)
+				return 0, true
+			}
+		}
+	}
+	log.Printf("%v", stack)
+	if stack.IsEmpty() {
+		log.Fatalf("Should have had an incomplete line here!")
+		return -1, true
+	}
+	log.Printf("Incomplete line: %s\nstack has %d elements: %v", line, len(stack), stack)
+	completion := ""
+	for !stack.IsEmpty() {
+		c, _ := stack.Pop()
+		log.Printf("Looking at %s and closing with %s", c, completions[c])
+		completion += completions[c]
+	}
+	log.Printf("Complete by adding %s", completion)
+	return scoreForCompletion(completion), false
+}
+
+func scoreForCompletion(s string) int {
+	score := 0
+	for _, c := range strings.Split(s, "") {
+		score *= 5
+		switch c {
+		case ")":
+			score += 1
+		case "]":
+			score += 2
+		case "}":
+			score += 3
+		case ">":
+			score += 4
+		}
+	}
+	return score
+}
+
 func scoreForIllegalChar(s string) int {
 	switch s {
 	case ")":
@@ -61,8 +135,6 @@ func scoreForIllegalChar(s string) int {
 	}
 	return -1
 }
-
-func Day10Part2() {}
 
 // LIFO stack
 type Stack []string
