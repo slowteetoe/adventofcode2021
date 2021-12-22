@@ -22,7 +22,18 @@ func Day11Part1() {
 }
 
 func Day11Part2() {
-
+	m := readOctopusMap("11-input.txt")
+	total := 0
+	life := OctopusLife{m, map[string]bool{}, &total}
+	for x := 1; ; x++ {
+		log.Printf("\n%s", life.String())
+		syn := life.step()
+		if syn {
+			log.Printf("All octopuses flashed at same time, step %d", x)
+			log.Printf("\n%s", life.String())
+			return
+		}
+	}
 }
 
 type OctopusLife struct {
@@ -35,7 +46,7 @@ func (o OctopusLife) String() string {
 	return fmt.Sprintf("%s\nFlashes: %d", o.OctopusMap.String(), *o.flashCount)
 }
 
-func (o OctopusLife) step() {
+func (o OctopusLife) step() bool {
 	// bump up energy levels
 	for y := range o.OctopusMap {
 		for x := range o.OctopusMap[y] {
@@ -56,12 +67,14 @@ func (o OctopusLife) step() {
 			}
 		}
 	}
+	flashesThisStep := len(o.flashed)
 	// reset energies to 0
 	for k := range o.flashed {
 		xy := strings.Split(k, ",")
 		o.OctopusMap[parseInt(xy[0])][parseInt(xy[1])] = 0
 		delete(o.flashed, k)
 	}
+	return flashesThisStep == len(o.OctopusMap[0])*len(o.OctopusMap)
 }
 
 func (o OctopusLife) flash(x, y int) {
