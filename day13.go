@@ -82,14 +82,13 @@ func (o OrigamiMap) display() {
 			maxY = k.y
 		}
 	}
-	log.Printf("need to display a %dx%d map", maxX, maxY)
 	var sb strings.Builder
 	for y := 0; y <= maxY; y++ {
 		for x := 0; x <= maxX; x++ {
 			if o.m[Point{x, y}] {
-				sb.WriteString("#")
+				sb.WriteString("■")
 			} else {
-				sb.WriteString(".")
+				sb.WriteString(" ")
 			}
 		}
 		sb.WriteString("\n")
