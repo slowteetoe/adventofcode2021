@@ -1,5 +1,7 @@
 package main
 
+import "slowteetoe.com/adventofcode2021/day16"
+
 var debug = false
 
 func main() {
@@ -29,6 +31,10 @@ func main() {
 	// Day12Part2()
 	// Day13Part1()
 	// Day13Part2()
-	Day14Part1()
+	// Day14Part1()
 	// Day14Part2()
+	// Day15Part1()
+	// Day15Part2()
+	day16.Day16Part1()
+	// Day16Part2()
 }

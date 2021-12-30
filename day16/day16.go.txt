@@ -1,0 +1,157 @@
+package day16
+
+import (
+	"bufio"
+	"fmt"
+	"log"
+	"os"
+	"strconv"
+	"strings"
+)
+
+var expMap = map[rune]string{
+	'0': "0000",
+	'1': "0001",
+	'2': "0010",
+	'3': "0011",
+	'4': "0100",
+	'5': "0101",
+	'6': "0110",
+	'7': "0111",
+	'8': "1000",
+	'9': "1001",
+	'A': "1010",
+	'B': "1011",
+	'C': "1100",
+	'D': "1101",
+	'E': "1110",
+	'F': "1111",
+}
+
+func Day16Part1() {
+	input, err := readString("day16/example.txt")
+	if err != nil {
+		log.Fatalf("Could not process input: %s", err.Error())
+	}
+	log.Printf("input is: %s", input)
+
+}
+
+type Packet interface {
+	Value() int
+}
+
+type OperatorPacket struct {
+}
+
+func (o OperatorPacket) Value() int {
+	return -1
+}
+
+func readOperatorPackets(bin string) []Packet {
+	packets := []Packet{}
+	// operator packet
+	// If the length type ID is 0, then the next 15 bits are a number that represents the total length in bits of the sub-packets contained by this packet.
+	// If the length type ID is 1, then the next 11 bits are a number that represents the number of sub-packets immediately contained by this packet.
+	log.Printf("length bit: %s", bin[6:7])
+	if bin[6:7] == "0" {
+		log.Printf("length of sub packets: %s", bin[7:22])
+		totalLengthSubPackets := parseBinary(bin[7:22])
+		log.Printf("totalLengthSubPackets = %d,", totalLengthSubPackets)
+		// do something with length?
+		packets = append(packets, decodePackets(bin[22:])...)
+	} else {
+		totalNumSubPackets := parseBinary(bin[7:18])
+		log.Printf("totalNumSubPackets: %d", totalNumSubPackets)
+		for n := 0; n < totalNumSubPackets; n++ {
+			log.Println("looking for another subpacket")
+			packets = append(packets, decodePackets(bin[18:])...)
+		}
+	}
+	return packets
+}
+
+type Type4Packet struct {
+	val int
+}
+
+func (t Type4Packet) Value() int {
+	return t.val
+}
+
+func readType4Packet(bin string) Type4Packet {
+	bits := ""
+	log.Printf("Reading type 4 packet from: %s", bin[6:])
+	next := bin[6:]
+	var rest string
+	for {
+		val := next[0:5]
+		// grab the next 5 bits, first bit will determine if there are more remaining
+		// 			The five bits labeled A (10111) start with a 1 (not the last group, keep reading) and contain the first four bits of the number, 0111.
+		// The five bits labeled B (11110) start with a 1 (not the last group, keep reading) and contain four more bits of the number, 1110.
+		// The five bits labeled C (00101) start with a 0 (last group, end of packet) and contain the last four bits of the number, 0101.
+		// The three unlabeled 0 bits at the end are extra due to the hexadecimal representation and should be ignored.
+		bits += next[1:]
+
+		next = rest[0:5]
+		rest = rest[5:]
+		if strings.HasPrefix(next, "0") {
+			bits += rest[5:11]
+			break
+		}
+	}
+	val := parseBinary(bits)
+	log.Printf("literal: %s (%d), remaining: %s", bits, val, rest)
+	return Type4Packet{val}
+}
+
+func parseBinary(s string) int {
+	i, err := strconv.ParseInt(s, 2, 0)
+	if err != nil {
+		log.Fatalf("Could not convert %s to an int", s)
+	}
+	return int(i)
+}
+
+func Day16Part2() {
+
+}
+
+// input is a string of 1s and 0s
+func decodePackets(bin string) []Packet {
+	log.Printf("attempting to decode: %s", bin)
+	packets := []Packet{}
+	version := parseBinary(bin[0:3])
+	typeID := parseBinary(bin[3:6])
+	log.Printf("Packet version: %d, type ID: %d", version, typeID)
+	if typeID == 4 {
+		packets = append(packets, readType4Packet(bin))
+	} else {
+		packets = append(packets, readOperatorPackets(bin)...)
+	}
+	log.Printf("Packets read: %v", packets)
+	return packets
+}
+
+func readString(filename string) (string, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		return scanner.Text(), nil
+	}
+	return "", fmt.Errorf("failed to read string")
+}
+
+func expandToBinary(s string) string {
+	exp := ""
+	for _, ch := range s {
+		exp += expMap[ch]
+	}
+	log.Printf("expanded: %s", exp)
+	return exp
+}
