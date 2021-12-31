@@ -7,6 +7,8 @@ import (
 	"os"
 	"sort"
 	"strings"
+
+	"slowteetoe.com/adventofcode2021/utils"
 )
 
 func Day7Part1() {
@@ -86,7 +88,7 @@ func readCrabs(filename string) []int {
 	for scanner.Scan() {
 		fields := strings.Split(scanner.Text(), ",")
 		for _, f := range fields {
-			crabs = append(crabs, parseInt(f))
+			crabs = append(crabs, utils.ParseInt(f))
 		}
 	}
 	return crabs

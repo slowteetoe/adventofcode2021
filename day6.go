@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 	"strings"
+
+	"slowteetoe.com/adventofcode2021/utils"
 )
 
 func Day6Part1() {
@@ -70,7 +72,7 @@ func readFishies(filename string) []int {
 	for scanner.Scan() {
 		fields := strings.Split(scanner.Text(), ",")
 		for _, f := range fields {
-			fish = append(fish, parseInt(f))
+			fish = append(fish, utils.ParseInt(f))
 		}
 	}
 	return fish

@@ -7,6 +7,8 @@ import (
 	"os"
 	"sort"
 	"strings"
+
+	"slowteetoe.com/adventofcode2021/utils"
 )
 
 // we'll have to keep track of visited points
@@ -153,7 +155,7 @@ func readHeightMap(filename string) [][]int {
 		s := scanner.Text()
 		thisRow := []int{}
 		for _, c := range strings.Split(s, "") {
-			thisRow = append(thisRow, parseInt(c))
+			thisRow = append(thisRow, utils.ParseInt(c))
 		}
 		heightMap = append(heightMap, thisRow)
 	}

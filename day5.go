@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 	"strings"
+
+	"slowteetoe.com/adventofcode2021/utils"
 )
 
 func Day5Part1() {
@@ -173,15 +174,7 @@ func (p Point) String() string {
 }
 
 func NewPoint(x string, y string) Point {
-	return Point{parseInt(x), parseInt(y)}
-}
-
-func parseInt(s string) int {
-	val, err := strconv.Atoi(s)
-	if err != nil {
-		log.Fatalf("Could not convert %s to int", s)
-	}
-	return val
+	return Point{utils.ParseInt(x), utils.ParseInt(y)}
 }
 
 func NewLine(start Point, end Point) Line {
@@ -189,7 +182,7 @@ func NewLine(start Point, end Point) Line {
 }
 
 func Max(x int, y string, z string) int {
-	return max(max(x, parseInt(y)), parseInt(z))
+	return max(max(x, utils.ParseInt(y)), utils.ParseInt(z))
 }
 
 func max(x, y int) int {

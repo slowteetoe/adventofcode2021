@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 	"strings"
+
+	"slowteetoe.com/adventofcode2021/utils"
 )
 
 func Day13Part1() {
@@ -59,9 +61,9 @@ func (o OrigamiMap) processFoldN(n int) {
 	cmd := strings.Split(o.foldInstructions[n], "=")
 	switch cmd[0] {
 	case "y":
-		o.foldY(parseInt(cmd[1]))
+		o.foldY(utils.ParseInt(cmd[1]))
 	case "x":
-		o.foldX(parseInt(cmd[1]))
+		o.foldX(utils.ParseInt(cmd[1]))
 	}
 }
 

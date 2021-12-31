@@ -7,6 +7,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"slowteetoe.com/adventofcode2021/utils"
 )
 
 func Day11Part1() {
@@ -71,7 +73,7 @@ func (o OctopusLife) step() bool {
 	// reset energies to 0
 	for k := range o.flashed {
 		xy := strings.Split(k, ",")
-		o.OctopusMap[parseInt(xy[0])][parseInt(xy[1])] = 0
+		o.OctopusMap[utils.ParseInt(xy[0])][utils.ParseInt(xy[1])] = 0
 		delete(o.flashed, k)
 	}
 	return flashesThisStep == len(o.OctopusMap[0])*len(o.OctopusMap)
@@ -139,7 +141,7 @@ func readOctopusMap(filename string) OctopusMap {
 		s := scanner.Text()
 		thisRow := []int{}
 		for _, c := range strings.Split(s, "") {
-			thisRow = append(thisRow, parseInt(c))
+			thisRow = append(thisRow, utils.ParseInt(c))
 		}
 		m = append(m, thisRow)
 	}
