@@ -18,7 +18,7 @@ func Day12Part1() {
 }
 
 func Day12Part2() {
-	caveSystem = readCaveMap("day12/example3.txt")
+	caveSystem = readCaveMap("day12/input.txt")
 	littleCaveAllowance = 2
 	spelunk(caveSystem["start"], []string{})
 	log.Printf("Number of Paths: %d", len(cavePaths))
@@ -27,6 +27,7 @@ func Day12Part2() {
 func spelunk(node Cave, visited []string) {
 	// log.Printf("(%v -> %s)", visited, node.symbol)
 	if strings.ToLower(node.symbol) == node.symbol {
+		// since this is a little cave, check the constraints
 		counts := map[string]int{}
 		for _, s := range visited {
 			counts[s]++
@@ -34,6 +35,19 @@ func spelunk(node Cave, visited []string) {
 		if counts["start"] > 1 {
 			// can't visit start node more than once, end node is covered bc we return immediately
 			return
+		}
+		exceptions := 0
+		for k, v := range counts {
+			if k == strings.ToLower(k) && k != "start" {
+				// checking a little cave
+				if v >= littleCaveAllowance && littleCaveAllowance != 1 {
+					if exceptions > 1 {
+						// no bueno, can't look further into this route
+						return
+					}
+					exceptions++ // but we'll let ONE little cave have multiples
+				}
+			}
 		}
 		if counts[node.symbol] >= littleCaveAllowance {
 			// log.Printf("Invalid route, lowercase cave %s already visited in %v", node.symbol, visited)
