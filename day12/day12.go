@@ -9,6 +9,7 @@ import (
 
 var cavePaths = [][]string{}
 var caveSystem = map[string]Cave{}
+var littleCaveAllowance = 1
 
 func Day12Part1() {
 	caveSystem = readCaveMap("day12/input.txt")
@@ -16,19 +17,46 @@ func Day12Part1() {
 	log.Printf("Number of Paths: %d", len(cavePaths))
 }
 
+func Day12Part2() {
+	caveSystem = readCaveMap("day12/example3.txt")
+	littleCaveAllowance = 2
+	spelunk(caveSystem["start"], []string{})
+	log.Printf("Number of Paths: %d", len(cavePaths))
+}
+
 func spelunk(node Cave, visited []string) {
 	// log.Printf("(%v -> %s)", visited, node.symbol)
 	if strings.ToLower(node.symbol) == node.symbol {
+		counts := map[string]int{}
 		for _, s := range visited {
-			if s == node.symbol {
-				// log.Printf("Invalid route, lowercase cave %s already visited in %v", node.symbol, visited)
-				return
-			}
+			counts[s]++
+		}
+		if counts["start"] > 1 {
+			// can't visit start node more than once, end node is covered bc we return immediately
+			return
+		}
+		if counts[node.symbol] >= littleCaveAllowance {
+			// log.Printf("Invalid route, lowercase cave %s already visited in %v", node.symbol, visited)
+			return
 		}
 	}
 	visited = append(visited, node.symbol)
 	if node.symbol == "end" {
-		log.Printf("journey complete: %s", strings.Join(visited, "->"))
+		// log.Printf("journey complete, checking route: %s", strings.Join(visited, "->"))
+		counts := map[string]int{}
+		for _, s := range visited {
+			counts[s]++
+		}
+		allowance := 1
+		for k, v := range counts {
+			if k == strings.ToLower(k) && v >= littleCaveAllowance {
+				allowance--
+				if allowance < 0 {
+					// log.Printf("rejecting route because more than one small cave visited multiple times: %v", counts)
+					return
+				}
+			}
+		}
 		cavePaths = append(cavePaths, visited)
 		return
 	}
@@ -58,7 +86,7 @@ func readCaveMap(filename string) map[string]Cave {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		caves := strings.Split(scanner.Text(), "-")
-		log.Printf("Joining %s and %s", caves[0], caves[1])
+		// log.Printf("Joining %s and %s", caves[0], caves[1])
 		var cave0 Cave
 		var cave1 Cave
 		if c0, ok := caveSystem[caves[0]]; !ok {
