@@ -1,8 +1,6 @@
 package main
 
-import (
-	"slowteetoe.com/adventofcode2021/day21"
-)
+import "slowteetoe.com/adventofcode2021/day12"
 
 var debug = false
 
@@ -29,6 +27,8 @@ func main() {
 	// Day10Part2()
 	// Day11Part1()
 	// Day11Part2()
+	day12.Day12Part1()
+	// Day12Part2()
 	// Day12Part1()
 	// Day12Part2()
 	// Day13Part1()
@@ -40,5 +40,6 @@ func main() {
 	// day16.Day16Part1()
 	// Day16Part2()
 	// day17.Day17()
-	day21.Day21Part1()
+	// day21.Day21Part1()
+	// day21.Day21Part2()
 }
