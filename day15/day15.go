@@ -6,6 +6,7 @@ import (
 	"log"
 	"math"
 	"os"
+	"strconv"
 	"strings"
 
 	"slowteetoe.com/adventofcode2021/utils"
@@ -23,7 +24,64 @@ func Day15Part1() {
 	// log.Printf("path: %v", bestPath)
 }
 
-func Day15Part2() {}
+func Day15Part2() {
+	orig := readCave("day15/input.txt")
+	expanded := expandMap(orig)
+	// printMap(expanded)
+	cavern = expanded
+	a_star(Point{0, 0}, Point{len(expanded[0]) - 1, len(expanded) - 1}, Manhattan)
+	log.Printf("Total risk: %d", totalRisk)
+}
+
+func printMap(m [][]int) {
+	var sb strings.Builder
+	sb.WriteString("\n")
+	for y := 0; y < len(m); y++ {
+		for x := range m[y] {
+			sb.WriteString(strconv.Itoa(m[y][x]))
+		}
+		sb.WriteString("\n")
+	}
+	log.Print(sb.String())
+}
+
+func expandMap(src [][]int) [][]int {
+	srcX := len(src[0])
+	srcY := len(src)
+	newMap := make([][]int, srcY*5)
+	for i := range newMap {
+		newMap[i] = make([]int, srcX*5)
+	}
+
+	// copy the original grid over
+	for y := range src {
+		for x := range src[0] {
+			newMap[y][x] = src[y][x]
+		}
+	}
+	// expand each row
+	for y := 0; y < srcY; y++ {
+		for x := srcX; x < len(newMap[0]); x++ {
+			newVal := newMap[y][x-srcX] + 1
+			if newVal == 10 {
+				newVal = 1
+			}
+			newMap[y][x] = newVal
+		}
+	}
+	// expand each column
+	for y := srcY; y < len(newMap); y++ {
+		for x := range newMap[y] {
+			newVal := newMap[y-srcY][x] + 1
+			if newVal == 10 {
+				newVal = 1
+			}
+			newMap[y][x] = newVal
+		}
+	}
+
+	return newMap
+}
 
 type Point struct {
 	x, y int
