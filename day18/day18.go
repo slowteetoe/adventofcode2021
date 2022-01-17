@@ -2,43 +2,47 @@ package day18
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"strconv"
 	"strings"
-
-	"github.com/bradleyjkemp/memviz"
 )
 
 func Day18Part1() {
 	snailfish := readSnailfish("day18/example.txt")
 	log.Printf("%v", snailfish)
 	l1 := parseSnailfish(snailfish[0])
+	// root := &Node{}
+	// rNode := &Node{}
+	// rlNode := &Node{}
+	// rlNode.left = Num{456}
+	// rlNode.right = Num{789}
+	// rrNode := &Node{}
+	// rrNode.right = Num{666}
+	// rNode.left = rlNode
+	// rNode.right = rrNode
+
+	// lNode := &Node{}
+	// lNode.left = Num{1}
+
+	// root.left = lNode
+	// root.right = rNode
 
 	var sb strings.Builder
 	print(l1, &sb)
 	log.Printf("tree: %s", sb.String())
 
-	// l2 := parseSnailfish(snailfish[1])
-	// sb.Reset()
-	// print(l2, &sb)
+	l2 := parseSnailfish(snailfish[1])
+	sb.Reset()
+	print(l2, &sb)
 
-	// l3 := add(l1, l2)
-	// sb.Reset()
-	// print(l3, &sb)
-	// log.Printf("result of adding l1 + l2: %+v", sb.String())
+	l3 := add(l1, l2)
+	sb.Reset()
+	print(l3, &sb)
+	log.Printf("result of adding l1 + l2: %+v", sb.String())
 
-	buf := &bytes.Buffer{}
-	memviz.Map(buf, &l1)
-	err := ioutil.WriteFile("snailfish-tree", buf.Bytes(), 0644)
-	if err != nil {
-		panic(err)
-	}
-
-	// l1.reduce()
+	l3.reduce()
 }
 
 func Day18Part2() {}
@@ -73,71 +77,8 @@ func (n Node) reduce() {
 	}
 }
 
-func (n *Node) explode() bool {
-	if n != nil {
-		n.explodeRecursively(0)
-		log.Printf("tree is now: %+v", n)
-	}
+func (n Node) explode() bool {
 	return false
-}
-
-func (n *Node) explodeRecursively(depth int) bool {
-	if depth >= 4 && numericPair(n.left, n.right) {
-		left, _ := n.left.(Num)
-		right, _ := n.right.(Num)
-		log.Printf("We're at depth %d, exploding %d, %d, parent=%+v", depth, left.val, right.val, n.parent)
-		newNode := &Node{}
-		if leftNum, ok := n.parent.left.(Num); ok {
-			log.Printf("Adding %d to %d", left.val, leftNum.val)
-			leftNum.val += left.val
-			newNode.left = &leftNum
-			newNode.right = &Num{0}
-			n.parent.right = newNode
-			return true
-		} else {
-			log.Printf("left was not a regular number, ignoring")
-		}
-		if rightNum, ok := n.parent.right.(Num); ok {
-			log.Printf("Adding %d to %d", right.val, rightNum.val)
-			rightNum.val += right.val
-			newNode.left = &Num{0}
-			newNode.right = &rightNum
-			n.parent.left = *newNode
-			return true
-		} else {
-			log.Printf("right was not a regular number, ignoring")
-		}
-		log.Printf("Something went horribly wrong!")
-		return true
-	}
-	if left, ok := n.left.(Node); ok {
-		log.Printf("going left to see if we can explode")
-		result := left.explodeRecursively(depth + 1)
-		if result {
-			return true
-		}
-	}
-	if right, ok := n.right.(Node); ok {
-		log.Printf("going right to see if we can explode")
-		result := right.explodeRecursively(depth + 1)
-		if result {
-			return true
-		}
-	}
-	return false
-}
-
-func numericPair(left, right Any) bool {
-	if left == nil || right == nil {
-		return false
-	}
-	if _, ok := left.(Num); !ok {
-		return false
-	}
-	if _, ok := right.(Num); !ok {
-		return false
-	}
-	return true
 }
 
 func (n Node) split() bool {
@@ -152,7 +93,7 @@ type Num struct {
 
 type Node struct {
 	parent      *Node
-	left, right *Any
+	left, right Any
 }
 
 func add(a, b Node) Node {
@@ -202,7 +143,7 @@ func parseSnailfish(line string) Node {
 		log.Printf("Ok, returning %+v", v)
 		return v
 	}
-	log.Fatalf("What I want to return is actually %+v, but something went horribly wrong!", finalTree)
+	log.Fatalf("What I want to return is actually %+v", finalTree)
 	return Node{}
 }
 
